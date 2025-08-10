@@ -1,4 +1,6 @@
 'use client'
+const API_URL = `${process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:5050"}/api/register/individual`;
+
 import React, { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
@@ -28,6 +30,7 @@ export default function RegistrationForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFinalSuccessModal, setShowFinalSuccessModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const validateField = (field: keyof typeof formData, value: string): string | undefined => {
     switch (field) {
@@ -117,43 +120,76 @@ export default function RegistrationForm() {
     return isValid;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      console.log('Form Data:', formData);
-      setShowSuccessModal(true);
-    } else {
-      // Scroll to first error
-      const firstErrorField = Object.keys(errors)[0];
-      if (firstErrorField) {
-        const element = document.querySelector(`[name="${firstErrorField}"]`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }
-    }
-  };
+  const handleSubmit = async (e?: React.FormEvent) => {
+  e?.preventDefault?.();
 
-  const handleCloseModal = () => {
-    // Send the data here (you can add your API call)
-    console.log('Sending form data:', formData);
+  if (validateForm()) {
+    setShowSuccessModal(true); 
+  } else {
     
-    // Reset form
-    setFormData({
-      name: '',
-      gender: '',
-      email: '',
-      phone: '',
-      studyWork: '',
-      specialization: '',
-      age: '',
-      skills: ''
+    const firstErrorField = Object.keys(errors)[0];
+    if (firstErrorField) {
+      document
+        .querySelector(`[name="${firstErrorField}"]`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+};
+
+  const handleCloseModal = async () => {
+  try {
+    setSubmitting(true);
+    setErrors({}); // clear old errors
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+      cache: "no-store",
     });
-    setErrors({});
-    
-    // Close confirmation modal and show success modal
+
+    const data = await res.json().catch(() => ({} as any));
+
+    if (res.status === 201 && data?.success) {
+      // Success → reset, close confirm, show final success
+      setFormData({
+        name: '', gender: '', email: '', phone: '',
+        studyWork: '', specialization: '', age: '', skills: ''
+      });
+      setErrors({});
+      setShowSuccessModal(false);
+      setShowFinalSuccessModal(true);
+      return;
+    }
+
+    if (res.status === 400 || res.status === 409) {
+      // Backend validation / duplicate → show field errors
+      const serverErrors = (data?.errors ?? {}) as FormErrors;
+      setErrors(serverErrors);
+      setShowSuccessModal(false); // close confirm, go back to form
+
+      // Scroll to first backend error
+      const firstServerError = Object.keys(serverErrors)[0];
+      if (firstServerError) {
+        document
+          .querySelector(`[name="${firstServerError}"]`)
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      return;
+    }
+
+    // Any other error
+    alert(data?.message || "حدث خطأ في الخادم. حاول لاحقًا.");
     setShowSuccessModal(false);
-    setShowFinalSuccessModal(true);
-  };
+
+  } catch (err) {
+    console.error("Submit error:", err);
+    alert("تعذر الاتصال بالخادم. تحقق من الاتصال ثم حاول مجددًا.");
+    setShowSuccessModal(false);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const handleCloseFinalModal = () => {
     setShowFinalSuccessModal(false);
