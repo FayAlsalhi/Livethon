@@ -1,9 +1,10 @@
 import { Rocket, Users, Hammer, DollarSign, Trophy } from "lucide-react";
+import Image from "next/image";
 
 export default function Benefits() {
   return (
     <section id="participation" className="mb-12 sm:mb-16 lg:mb-24 relative overflow-hidden">
-      <img src="/side.svg" alt="decorative" className="hidden md:block absolute left-0 top-0 h-full w-auto opacity-60 select-none pointer-events-none" />
+      <Image src="/side.svg" alt="decorative" width={400} height={800} className="hidden md:block absolute left-0 top-0 h-full w-auto opacity-60 select-none pointer-events-none" />
       <div className="text-center max-w-4xl mx-auto px-4">
         <h3 className=" py-5 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold mb-12 sm:mb-16 text-[#FFD230] font-[amiri] ">
           ماذا ستستفيد من المشاركة ؟

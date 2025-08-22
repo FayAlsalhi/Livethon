@@ -150,7 +150,7 @@ export default function RegistrationForm() {
       cache: "no-store",
     });
 
-    const data = await res.json().catch(() => ({} as any));
+    const data = await res.json().catch(() => ({} as Record<string, unknown>));
 
     if (res.status === 201 && data?.success) {
       // Success → reset, close confirm, show final success

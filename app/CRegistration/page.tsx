@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import React from 'react';
+import Image from 'next/image';
 
 export default function ChooseRegistration() {
   return (
@@ -11,8 +12,8 @@ export default function ChooseRegistration() {
       <div className="relative z-20">
         <div className="flex flex-row justify-between items-center gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-6 lg:p-6">
           <div className="flex gap-1">
-            <span><img src="/Flower.svg" alt="Lifethon Logo" className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
-            <span><img src="/Text.svg" alt="Lifethon Logo" className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
+            <span><Image src="/Flower.svg" alt="Lifethon Logo" width={96} height={96} priority className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
+            <span><Image src="/Text.svg" alt="Lifethon Logo" width={96} height={96} priority className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
           </div>
 
           <Link href="/" className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-2 md:py-3 lg:py-4 rounded-full border border-gray-600 hover:bg-gray-800/50 transition-colors text-xs sm:text-sm md:text-base lg:text-lg">
@@ -27,9 +28,10 @@ export default function ChooseRegistration() {
               مرحبًا بك في عالم
             </p>
             <div className="flex justify-center">
-              <img
+              <Image
                 src="/lifethon.svg"
                 alt="Lifethon Logo"
+                width={640} height={200} priority
                 className="mx-auto w-40 sm:w-52 md:w-64 lg:w-80 xl:w-[26rem] object-contain select-none pointer-events-none"
               />
             </div>
@@ -65,14 +67,14 @@ export default function ChooseRegistration() {
               <Link href="/registration-team" className="group">
                 <div className="rounded-[30px] p-6 sm:p-8 text-center transition-all duration-300 border-3 border-white/10 group-hover:border-white/30 opacity-80  hover:opacity-100 transition-opacity duration-300"  style={{ background: 'linear-gradient(180deg, rgba(53,50,70,0.95) 0%, rgba(62,58,81,0.85) 100%)', boxShadow: '0 4px 60px 0 rgba(255,255,255,0.06)' }}>
                   <h3 className="text-xl sm:text-2xl md:text-3xl text-white mb-1">تسجيل فريق</h3>
-                  <div className="mx-auto  flex items-center justify-center"><img src="/team Icon.svg" alt="team icon" className="w-20 h-20 sm:w-28 sm:h-28  md:w-38 md:h-38 lg:w-50 lg:h-50 xl:w-58 xl:h-58  flex items-center justify-center  " /></div>
+                  <div className="mx-auto  flex items-center justify-center"><Image src="/team Icon.svg" alt="team icon" width={232} height={232} className="w-20 h-20 sm:w-28 sm:h-28  md:w-38 md:h-38 lg:w-50 lg:h-50 xl:w-58 xl:h-58  flex items-center justify-center  " /></div>
                 </div>
               </Link>
 
               <Link href="/registration" className="group">
                 <div className="rounded-[30px] p-6 sm:p-8 text-center transition-all duration-300 border-3 border-white/10 group-hover:border-white/30 opacity-70  hover:opacity-80 transition-opacity duration-300"  style={{ background: 'linear-gradient(180deg, rgba(53,50,70,0.95) 0%, rgba(62,58,81,0.85) 100%)', boxShadow: '0 4px 60px 0 rgba(255,255,255,0.06)' }}>
                   <h3 className="text-xl sm:text-2xl md:text-3xl text-white mb-1">تسجيل فردي</h3>
-                  <div className="mx-auto  flex items-center justify-center opacity-50"><img src="/lonely Iconl.svg" alt="team icon" className="w-15 h-20 sm:w-22 sm:h-28  md:w-28 md:h-38 lg:w-38 lg:h-50 xl:w-40 xl:h-58  flex items-center justify-center  " /></div>
+                  <div className="mx-auto  flex items-center justify-center opacity-50"><Image src="/lonely Iconl.svg" alt="team icon" width={160} height={232} className="w-15 h-20 sm:w-22 sm:h-28  md:w-28 md:h-38 lg:w-38 lg:h-50 xl:w-40 xl:h-58  flex items-center justify-center  " /></div>
                 </div>
               </Link>
             </div>
