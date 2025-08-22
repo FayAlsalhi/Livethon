@@ -1,6 +1,8 @@
 'use client'
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 
 interface TeamMember {
   name: string;
@@ -64,7 +66,7 @@ export default function TeamRegistrationForm() {
       ...prev,
       teamLeader: { ...prev.teamLeader, [field]: value }
     }));
-    // Clear error when user starts typing
+    
     if (leaderErrors[field]) {
       setLeaderErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -72,7 +74,7 @@ export default function TeamRegistrationForm() {
 
   const updateTeamInfo = (field: keyof Pick<TeamFormData, 'teamName' | 'projectIdea'>, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+    
     if (teamInfoErrors[field]) {
       setTeamInfoErrors(prev => {
         const newErrors = { ...prev };
@@ -90,7 +92,7 @@ export default function TeamRegistrationForm() {
       )
     }));
     
-    // Clear error when user starts typing
+   
     if (memberErrors[memberIndex]?.[field]) {
       setMemberErrors(prev => {
         const newErrors = { ...prev };
@@ -111,10 +113,10 @@ export default function TeamRegistrationForm() {
   };
 
   const handleCloseModal = () => {
-    // Send the data here (you can add your API call)
+    
     console.log('Sending team form data:', formData);
     
-    // Reset form data
+    
     setFormData({
       teamName: '',
       projectIdea: '',
@@ -137,15 +139,15 @@ export default function TeamRegistrationForm() {
       ]
     });
     
-    // Clear all errors
+    
     setLeaderErrors({});
     setTeamInfoErrors({});
     setMemberErrors({});
     
-    // Reset to first stage (team leader)
+   
     setActiveTab(0);
     
-    // Close confirmation modal and show success modal
+    
     setShowSuccessModal(false);
     setShowFinalSuccessModal(true);
   };
@@ -170,7 +172,7 @@ export default function TeamRegistrationForm() {
         return undefined;
       case 'phone':
         if (!trimmed) return 'هذا الحقل مطلوب';
-        // Remove spaces and validate Saudi mobile: +9665######## or 05########
+        
         const cleanPhone = trimmed.replace(/\s/g, '');
         if (!/^(?:\+966|0)5\d{8}$/.test(cleanPhone)) return 'رقم الجوال غير صحيح';
         return undefined;
@@ -220,17 +222,15 @@ export default function TeamRegistrationForm() {
   const validateTeamInfo = (): Record<string, string> => {
     const errors: Record<string, string> = {};
     
-    // Team name validation
+    
     if (!formData.teamName.trim()) {
       errors.teamName = 'اسم الفريق مطلوب';
     }
     
-    // Team number validation
     if (!formData.teamNumber) {
       errors.teamNumber = 'يجب تحديد عدد أعضاء الفريق';
     }
     
-    // Project idea validation
     if (!formData.projectIdea.trim()) {
       errors.projectIdea = 'فكرة المشروع مطلوبة';
     } else if (formData.projectIdea.trim().length < 20) {
@@ -247,19 +247,16 @@ export default function TeamRegistrationForm() {
     for (let i = 0; i < memberCount; i++) {
       const member = formData.members[i];
       
-      // Skip validation if member is undefined
       if (!member) continue;
       
       const memberErrors: Partial<Record<keyof TeamMember, string>> = {};
       
-      // Name validation
       if (!member.name?.trim()) {
         memberErrors.name = 'اسم العضو مطلوب';
       } else if (member.name.trim().length < 2) {
         memberErrors.name = 'الاسم قصير جداً';
       }
       
-      // Email validation
       if (!member.email?.trim()) {
         memberErrors.email = 'البريد الإلكتروني مطلوب';
       } else if (!/^\S+@\S+\.\S+$/.test(member.email.trim())) {
@@ -288,7 +285,6 @@ export default function TeamRegistrationForm() {
       setMemberErrors(errors);
       if (Object.keys(errors).length > 0) return;
     }
-    // Clear errors when moving to next tab
     setLeaderErrors({});
     setTeamInfoErrors({});
     setMemberErrors({});
@@ -297,7 +293,7 @@ export default function TeamRegistrationForm() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 0: // قائد الفريق
+      case 0: 
         return (
           <div className="space-y-4 md:space-y-5 flex flex-col items-center">
             {/* NAME FIELD */}
@@ -959,47 +955,36 @@ export default function TeamRegistrationForm() {
         <div className="flex flex-row justify-between items-center gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-6 lg:p-6">
           {/* Logo Section */}
           <div className="flex gap-1">
-            <span><img src="/Flower.svg" alt="Lifethon Logo" className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain" /></span>
-            <span><img src="/Text.svg" alt="Lifethon Logo" className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain" /></span>
+            <span><Image src="/Flower.svg" alt="Lifethon Logo" width={96} height={96} priority className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
+            <span><Image src="/Text.svg" alt="Lifethon Logo" width={96} height={96} priority className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
           </div>
           
           {/* Back Button */}
-          <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-2 md:py-3 lg:py-4 rounded-full border border-gray-600 hover:bg-gray-800/50 transition-colors text-xs sm:text-sm md:text-base lg:text-lg">
-            <span 
-              className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
-              style={{ fontFamily: 'Adobe Arabic, Arial' }}
-            >
-              عودة إلى تفاصيل الهاكثون
-            </span>
-            <div className="flex">
-              <ChevronLeft size={14} className="block sm:hidden -mr-1" />
-              <ChevronLeft size={16} className="hidden sm:block md:hidden -mr-1" />
-              <ChevronLeft size={20} className="hidden md:block lg:hidden -mr-1" />
-              <ChevronLeft size={24} className="hidden lg:block -mr-1" />
-            </div>
-          </button>
+          <Link href="/CRegistration" className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-2 md:py-3 lg:py-4 rounded-full border border-gray-600 hover:bg-gray-800/50 transition-colors text-xs sm:text-sm md:text-base lg:text-lg">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl ">عودة إلى تفاصيل الهاكثون</span>
+            <ChevronLeft size={20} className="-mr-1" />
+          </Link>
         </div>
 
                   {/* MAIN CONTENT */}
         <div className="flex flex-col items-center px-3 sm:px-4 md:px-6 pb-6 sm:pb-8">
           {/* TITLE SECTION */}
           <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12">
-            <p className="text-[#DFDFDF] mb-2 sm:mb-3 md:mb-4 text-sm sm:text-base md:text-2xl lg:text-3xl" style={{ fontFamily: 'Adobe Arabic, Arial' }}>
-              للتسجيل في
+            <p className="text-[#DFDFDF] mb-2 sm:mb-3 md:mb-4  mb-2 sm:mb-3 md:mb-4 text-md sm:text-lg md:text-3xl lg:text-4xl xl:text-5xl font-[amiri]">
+              للتسجيل بفريق في
             </p>
             <div className="relative flex justify-center">
-            <h1 
-                className="bg-gradient-to-r from-[#E8E7F3] to-[#8176AF] bg-clip-text text-transparent text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
-                style={{
-                  fontFamily: 'Adobe Arabic, Arial',
-                  fontWeight: 400,
-                  lineHeight: '100%',
-                  letterSpacing: '0%',
-                  textAlign: 'center'
-                }}
-              >
-                لايــفــثــون
-              </h1>
+            <div className="flex justify-center">
+              <Image
+                src="/lifethon.svg"
+                alt="Lifethon Logo"
+                width={640}
+                height={200}
+                priority
+                sizes="(max-width: 640px) 160px, (max-width: 1024px) 256px, 416px"
+                className="mx-auto w-40 sm:w-52 md:w-64 lg:w-80 xl:w-[26rem] h-auto object-contain select-none pointer-events-none"
+              />
+            </div>
               
             </div>
           </div>

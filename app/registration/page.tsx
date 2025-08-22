@@ -2,7 +2,9 @@
 const API_URL = `${process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:5050"}/api/register/individual`;
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 
 interface FormErrors {
   name?: string;
@@ -212,37 +214,22 @@ export default function RegistrationForm() {
   return (
     <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden" dir="rtl">
       {/*  purple tone */}
-      <div className="absolute -top-2 -right-32 w-[200px] h-[200px] md:w-[250px] md:h-[300px] lg:w-[400px] lg:h-[500px] bg-[#7877C6]/20 rounded-full blur-[100px] md:blur-[120px]"></div>
-      <div className="absolute -bottom-48 -left-48 w-[250px] h-[250px] md:w-[350px] md:h-[350px] lg:w-[400px] lg:h-[400px] bg-[#7877C6]/15 rounded-full blur-[100px] md:blur-[120px]"></div>
+      <div className="absolute -top-2 -right-32 w-[300px] h-[300px] md:w-[250px] md:h-[300px] lg:w-[400px] lg:h-[500px] bg-[#7877C6]/20 rounded-full blur-[90px] sm:blur-[100px] md:blur-[120px]"></div>
+      <div className="absolute -bottom-48 -left-48 w-[250px] h-[250px] md:w-[350px] md:h-[350px] lg:w-[400px] lg:h-[400px] bg-[#7877C6]/15 rounded-full blur-[90px] sm:blur-[100px] md:blur-[120px]"></div>
       
       {/* Content wrapper */}
       <div className="relative z-20">
         {/* HEADER SECTION */}
-        <div className="flex flex-row justify-between items-center gap-4 p-4 md:p-6 lg:p-6">
-          {/* Logo Section */}
-          <div className="flex gap-1 sm:gap-1">
-            <span><img src="/Flower.svg" alt="Lifethon Logo" className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 object-contain" /></span>
-            <span><img src="/Text.svg" alt="Lifethon Logo" className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 object-contain" /></span>
+        <div className="flex flex-row justify-between items-center gap-2 sm:gap-3 md:gap-4 p-3 sm:p-4 md:p-6 lg:p-6">
+          <div className="flex gap-1">
+            <span><Image src="/Flower.svg" alt="Lifethon Logo" width={96} height={96} priority className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
+            <span><Image src="/Text.svg" alt="Lifethon Logo" width={96} height={96} priority className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain select-none pointer-events-none" /></span>
           </div>
-          
-          {/* Back Button */}
-          <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-2 md:py-3 lg:py-4 rounded-full border border-gray-600 hover:bg-gray-800/50 transition-colors text-xs sm:text-sm md:text-base lg:text-lg">
-            <span 
-              className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
-              style={{ fontFamily: 'Adobe Arabic, Arial' }}
-            >
-              عودة إلى تفاصيل الهاكثون
-            </span>
-            <div className="flex">
-              
-              <ChevronLeft size={16} className="hidden sm:block md:hidden -mr-1" />
-              <ChevronLeft size={16} className="hidden sm:block md:hidden -mr-1" />
-              <ChevronLeft size={20} className="hidden md:block lg:hidden -mr-1" />
-              <ChevronLeft size={20} className="hidden md:block lg:hidden -mr-1" />
-              <ChevronLeft size={24} className="hidden lg:block -mr-1" />
-              <ChevronLeft size={24} className="hidden lg:block -mr-1" />
-            </div>
-          </button>
+
+          <Link href="/CRegistration" className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 lg:px-6 py-1 sm:py-2 md:py-3 lg:py-4 rounded-full border border-gray-600 hover:bg-gray-800/50 transition-colors text-xs sm:text-sm md:text-base lg:text-lg">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl">عودة إلى تفاصيل الهاكثون</span>
+            <ChevronLeft size={20} className="-mr-1" />
+          </Link>
         </div>
 
         {/* MAIN CONTENT */}
@@ -250,27 +237,15 @@ export default function RegistrationForm() {
           {/* TITLE SECTION */}
           <div className="text-center mb-8 md:mb-12">
             <p 
-              className="text-[#DFDFDF] mb-2 md:mb-4 text-base md:text-3xl"
-              style={{ fontFamily: 'Adobe Arabic, Arial' }}
-            >
+              className="text-[#DFDFDF] mb-2 md:mb-4  mb-2 sm:mb-3 md:mb-4 text-md sm:text-lg md:text-3xl lg:text-4xl xl:text-5xl font-[amiri]">
               للتسجيل الفردي في
             </p>
             <div className="relative flex justify-center">
-              <h1 
-                className="bg-gradient-to-r from-[#E8E7F3] to-[#8176AF] bg-clip-text text-transparent text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl"
-                style={{
-                  fontFamily: 'Adobe Arabic, Arial',
-                  fontWeight: 400,
-                  lineHeight: '100%',
-                  letterSpacing: '0%',
-                  textAlign: 'center'
-                }}
-              >
-                لايــفــثــون
-              </h1>
+              <div className="flex justify-center">
+                <Image src="/lifethon.svg" alt="Lifethon Logo" width={640} height={200} priority sizes="(max-width: 640px) 160px, (max-width: 1024px) 256px, 416px" className="mx-auto w-40 sm:w-52 md:w-64 lg:w-80 xl:w-[26rem] h-auto object-contain select-none pointer-events-none" />
+              </div>
               {/* Decorative stars */}
-              <span className="absolute -top-4 md:-top-6 right-0 text-yellow-400 text-xl md:text-3xl">✦</span>
-              <span className="absolute top-1/2 -right-8 md:-right-16 text-blue-400 text-lg md:text-2xl">✦</span>
+             
             </div>
           </div>
 
@@ -303,7 +278,7 @@ export default function RegistrationForm() {
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="ادخل الاسم كاملا"
-                  className={`w-full text-white placeholder-gray-500 text-right focus:ring-3 focus:outline-none transition-all text-sm md:text-base lg:text-lg xl:text-xl ${
+                  className={`w-full text-white placeholder-gray-500 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base lg:text-lg xl:text-xl ${
                     errors.name ? 'focus:ring-red-500/50 border-red-500' : 'focus:ring-gray-500/100'
                   }`}
                   style={{
@@ -388,7 +363,7 @@ export default function RegistrationForm() {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="example@email.com"
-                  className={`w-full text-white placeholder-gray-500 text-center text-left focus:ring-3 focus:outline-none transition-all text-sm md:text-base ${
+                  className={`w-full text-white placeholder-gray-500 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base ${
                     errors.email ? 'focus:ring-red-500/50 border-red-500' : 'focus:ring-gray-500/100'
                   }`}
                   dir="ltr"
@@ -452,7 +427,7 @@ export default function RegistrationForm() {
                   value={formData.studyWork}
                   onChange={(e) => handleInputChange('studyWork', e.target.value)}
                   placeholder="مثل جامعة القصيم"
-                  className={`w-full text-white placeholder-gray-500 text-right focus:ring-3 focus:outline-none transition-all text-sm md:text-base ${
+                  className={`w-full text-white placeholder-gray-500 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base ${
                     errors.studyWork ? 'focus:ring-red-500/50 border-red-500' : 'focus:ring-gray-500/100'
                   }`}
                   style={{
@@ -559,7 +534,7 @@ export default function RegistrationForm() {
                   placeholder="اضف مهاراتك وخبراتك هنا"
                   rows={3}
                   className={`w-full text-white placeholder-gray-500 text-right focus:ring-3 focus:outline-none transition-all resize-none text-sm md:text-base ${
-                    errors.skills ? 'focus:ring-red-500/50 border-red-500' : 'focus:ring-gray-500/10'
+                    errors.skills ? 'focus:ring-red-500/50 border-red-500' : 'focus:ring-gray-500/100'
                   }`}
                   style={{
                     borderRadius: '11.3px',
