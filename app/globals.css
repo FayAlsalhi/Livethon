@@ -28,11 +28,40 @@ body {
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior: none;
+}
+
+body {
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 
 header.active {
   padding-top: 40px;
- 
+  transition: padding-top 0.3s ease;
 }
+
+* {
+  overscroll-behavior: none;
+}
+
+
+
+  
+  
+  html, body {
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    touch-action: pan-y;
+  }
+  
+  
+  .min-h-screen {
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    position: relative;
+  }
+
 

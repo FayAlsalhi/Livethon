@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function ChooseRegistration() {
   return (
-    <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden font-[amiri]" dir="rtl">
+    <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden font-[amiri]" dir="rtl" style={{ overscrollBehavior: 'none', touchAction: 'pan-y' }}>
       <div className="absolute -top-2 -right-32 w-[200px] h-[200px] md:w-[250px] md:h-[300px] lg:w-[400px] lg:h-[500px] bg-[#7877C6]/20 rounded-full blur-[100px] md:blur-[120px]"></div>
       <div className="absolute -bottom-48 -left-48 w-[250px] h-[250px] md:w-[350px] md:h-[350px] lg:w-[400px] lg:h-[400px] bg-[#7877C6]/15 rounded-full blur-[100px] md:blur-[120px]"></div>
 

@@ -16,7 +16,7 @@ import Benefits from './components/Benefits';
 export default function Home() {
 
   return (
-    <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden  font-[amiri]" dir="rtl">
+    <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden  font-[amiri]" dir="rtl" style={{ overscrollBehavior: 'none', touchAction: 'pan-y' }}>
       {/* Background Elements */}
       <div className="absolute rotate-90 -right-10 w-[350px] h-[350px] md:w-[400px] md:h-[400px] lg:w-[400px] lg:h-[700px] xl:w-[400px] xl:h-[700px] bg-[#7877C6]/25 rounded-full blur-[10px] blur-[100px]"></div>
       <div className="absolute -bottom-8 -left-28 w-[250px] h-[250px] md:w-[350px] md:h-[350px] lg:w-[400px] lg:h-[400px] bg-[#7877C6]/25 rounded-full blur-[100px] md:blur-[120px]"></div>

@@ -944,7 +944,7 @@ export default function TeamRegistrationForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden" dir="rtl">
+    <div className="min-h-screen bg-[#08070D] text-white relative overflow-hidden" dir="rtl" style={{ overscrollBehavior: 'none', touchAction: 'pan-y' }}>
       {/*  purple tone */}
       <div className="absolute -top-2 -right-32 w-[200px] h-[200px] md:w-[250px] md:h-[300px] lg:w-[400px] lg:h-[500px] bg-[#7877C6]/20 rounded-full blur-[100px] md:blur-[120px]"></div>
       <div className="absolute -bottom-48 -left-48 w-[250px] h-[250px] md:w-[350px] md:h-[350px] lg:w-[400px] lg:h-[400px] bg-[#7877C6]/15 rounded-full blur-[100px] md:blur-[120px]"></div>
@@ -970,7 +970,7 @@ export default function TeamRegistrationForm() {
         <div className="flex flex-col items-center px-3 sm:px-4 md:px-6 pb-6 sm:pb-8">
           {/* TITLE SECTION */}
           <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12">
-            <p className="text-[#DFDFDF] mb-2 sm:mb-3 md:mb-4  mb-2 sm:mb-3 md:mb-4 text-md sm:text-lg md:text-3xl lg:text-4xl xl:text-5xl font-[amiri]">
+            <p className="text-[#DFDFDF] mb-2 sm:mb-3 md:mb-4  mb-2 sm:mb-3 md:mb-4 text-md sm:text-lg md:text-3xl lg:text-4xl xl:text-5xl font-[amiri] ">
               للتسجيل بفريق في
             </p>
             <div className="relative flex justify-center">
