@@ -16,7 +16,7 @@ export default function Hero() {
         </div>
         <div className="relative -mt-3 sm:-mt-4 md:-mt-4 lg:-mt-8 xl:-mt-10">
           <div className="relative">
-            <Image src="/Lifethon.svg" alt="Lifethon Logo" width={900} height={240} priority className="mx-auto w-40 sm:w-52 md:w-64 lg:w-80 xl:w-160 h-auto object-contain select-none pointer-events-none" />
+            <Image src="/lifethon.svg" alt="Lifethon Logo" width={900} height={240} priority className="mx-auto w-64 sm:w-80 md:w-96 lg:w-[28rem] xl:w-[32rem] h-auto object-contain select-none pointer-events-none" />
           </div>
         </div>
         <p className="text-white text-xs sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-6 sm:mb-6 leading-relaxed">
