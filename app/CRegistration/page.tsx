@@ -74,7 +74,7 @@ export default function ChooseRegistration() {
               <Link href="/registration" className="group">
                 <div className="rounded-[30px] p-6 sm:p-8 text-center transition-all duration-300 border-3 border-white/10 group-hover:border-white/30 opacity-70  hover:opacity-80 transition-opacity duration-300"  style={{ background: 'linear-gradient(180deg, rgba(53,50,70,0.95) 0%, rgba(62,58,81,0.85) 100%)', boxShadow: '0 4px 60px 0 rgba(255,255,255,0.06)' }}>
                   <h3 className="text-xl sm:text-2xl md:text-3xl text-white mb-1">تسجيل فردي</h3>
-                  <div className="mx-auto  flex items-center justify-center opacity-50"><Image src="/lonely Iconl.svg" alt="individual icon" width={160} height={232} className="w-16 h-20 sm:w-22 sm:h-28  md:w-28 md:h-32 lg:w-32 lg:h-40 xl:w-40 xl:h-48  flex items-center justify-center  " /></div>
+                  <div className="mx-auto  flex items-center justify-center "><Image src="/lonely Icon.svg" alt="team icon" width={160} height={232} className="w-15 h-20 sm:w-22 sm:h-28  md:w-28 md:h-38 lg:w-38 lg:h-50 xl:w-40 xl:h-58  flex items-center justify-center opacity-60  " /></div>
                 </div>
               </Link>
             </div>
