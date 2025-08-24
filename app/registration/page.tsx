@@ -1,5 +1,6 @@
 'use client'
-const API_URL = `${process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:5050"}/api/register/individual`;
+// API configuration - direct backend communication
+const API_URL = 'http://localhost:5050/api/register/individual';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -55,8 +56,8 @@ export default function RegistrationForm() {
       
       case 'phone':
         if (!value.trim()) return 'رقم الجوال مطلوب';
-        const phoneRegex = /^(\+966|966)?[0-9]{9}$/;
-        if (!phoneRegex.test(value.replace(/\s/g, ''))) return 'رقم الجوال غير صحيح (مثال: +966501234567)';
+        const phoneRegex = /^(?:\+966|0)5\d{8}$/;
+        if (!phoneRegex.test(value.replace(/\s/g, ''))) return 'رقم الجوال غير صحيح (مثال: +966501234567 أو 0501234567)';
         return undefined;
       
       case 'studyWork':

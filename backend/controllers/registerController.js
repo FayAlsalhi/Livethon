@@ -3,13 +3,12 @@ import Individual from "../models/Individual.js";
 
 export const registerIndividual = async (req, res) => {
   try {
-    // 1) Validate
     const parsed = individualRegisterSchema.safeParse(req.body);
     if (!parsed.success) {
       const errors = {};
       for (const e of parsed.error.errors) {
         const field = e.path[0];
-        if (!errors[field]) errors[field] = e.message; // first error per field
+        if (!errors[field]) errors[field] = e.message; 
       }
       return res.status(400).json({
         success: false,
@@ -20,7 +19,7 @@ export const registerIndividual = async (req, res) => {
 
     const data = parsed.data;
 
-    // 2) Duplicate check (email or phone)
+    
     const existing = await Individual.findOne({
       $or: [{ email: data.email.toLowerCase().trim() }, { phone: data.phone.trim() }]
     });
@@ -36,10 +35,10 @@ export const registerIndividual = async (req, res) => {
       });
     }
 
-    // 3) Save
+    
     const doc = await Individual.create(data);
 
-    // 4) Respond (spec)
+    
     return res.status(201).json({
       success: true,
       message: "تم التسجيل بنجاح",
@@ -49,7 +48,7 @@ export const registerIndividual = async (req, res) => {
       },
     });
   } catch (error) {
-    // Handle Mongo duplicate key (race condition safety)
+    
     if (error?.code === 11000) {
       const errors = {};
       if (error.keyPattern?.email) errors.email = "البريد الإلكتروني مستخدم بالفعل";

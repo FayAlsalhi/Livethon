@@ -24,6 +24,9 @@ interface TeamFormData {
   members: TeamMember[];
 }
 
+// API configuration - direct backend communication
+const API_URL = 'http://localhost:5050/api/register/team';
+
 export default function TeamRegistrationForm() {
   const [activeTab, setActiveTab] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -31,11 +34,12 @@ export default function TeamRegistrationForm() {
   const [leaderErrors, setLeaderErrors] = useState<Partial<Record<keyof TeamMember, string>>>({});
   const [teamInfoErrors, setTeamInfoErrors] = useState<Record<string, string>>({});
   const [memberErrors, setMemberErrors] = useState<Record<number, Partial<Record<keyof TeamMember, string>>>>({});
+  const [submitting, setSubmitting] = useState(false);
   
   const [formData, setFormData] = useState<TeamFormData>({
     teamName: '',
     projectIdea: '',
-    teamNumber: '',
+    teamNumber: '3', // Default to 3 members (minimum)
     teamLeader: {
       name: '',
       email: '',
@@ -48,7 +52,6 @@ export default function TeamRegistrationForm() {
       skills: ''
     },
     members: [
-      { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
       { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
       { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' }
     ]
@@ -72,8 +75,39 @@ export default function TeamRegistrationForm() {
     }
   };
 
-  const updateTeamInfo = (field: keyof Pick<TeamFormData, 'teamName' | 'projectIdea'>, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const updateTeamInfo = (field: keyof Pick<TeamFormData, 'teamName' | 'projectIdea' | 'teamNumber'>, value: string) => {
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // If teamNumber changed, update members array
+      if (field === 'teamNumber') {
+        const memberCount = parseInt(value) - 1; // Subtract 1 for team leader
+        const newMembers = [];
+        
+        for (let i = 0; i < memberCount; i++) {
+          // Keep existing member data if available, otherwise create new
+          newMembers.push(prev.members[i] || {
+            name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: ''
+          });
+        }
+        
+        newData.members = newMembers;
+        
+        // Clear member errors for removed members
+        setMemberErrors(prev => {
+          const newErrors = { ...prev };
+          Object.keys(newErrors).forEach(key => {
+            const index = parseInt(key);
+            if (index >= memberCount) {
+              delete newErrors[index];
+            }
+          });
+          return newErrors;
+        });
+      }
+      
+      return newData;
+    });
     
     if (teamInfoErrors[field]) {
       setTeamInfoErrors(prev => {
@@ -92,15 +126,12 @@ export default function TeamRegistrationForm() {
       )
     }));
     
-   
+    // Clear error for this field
     if (memberErrors[memberIndex]?.[field]) {
       setMemberErrors(prev => {
         const newErrors = { ...prev };
         if (newErrors[memberIndex]) {
           delete newErrors[memberIndex][field];
-          if (Object.keys(newErrors[memberIndex]).length === 0) {
-            delete newErrors[memberIndex];
-          }
         }
         return newErrors;
       });
@@ -108,48 +139,171 @@ export default function TeamRegistrationForm() {
   };
 
   const handleSubmit = () => {
+    console.log('=== SUBMIT BUTTON CLICKED ===');
+    console.log('Current active tab:', activeTab);
     console.log('Form Data:', formData);
+    
+    // Client-side validation before showing confirmation modal
+    const leaderErrors = validateTeamLeader();
+    const teamInfoErrors: Record<string, string> = {};
+    
+    // Debug form data
+    console.log('Team size:', formData.teamNumber);
+    console.log('Members count:', formData.members.length);
+    console.log('Expected members:', parseInt(formData.teamNumber) - 1);
+    
+    // Validate team info
+    if (!formData.teamName.trim()) teamInfoErrors.teamName = 'اسم الفريق مطلوب';
+    if (!formData.projectIdea.trim()) teamInfoErrors.projectIdea = 'فكرة المشروع مطلوبة';
+    if (!formData.teamNumber) teamInfoErrors.teamNumber = 'يجب تحديد عدد أعضاء الفريق';
+    
+    // Validate members
+    const memberErrors: Record<number, Partial<Record<keyof TeamMember, string>>> = {};
+    formData.members.forEach((member, index) => {
+      if (!member.name.trim()) {
+        if (!memberErrors[index]) memberErrors[index] = {};
+        memberErrors[index]!.name = 'اسم العضو مطلوب';
+      }
+      if (!member.email.trim()) {
+        if (!memberErrors[index]) memberErrors[index] = {};
+        memberErrors[index]!.email = 'البريد الإلكتروني مطلوب';
+      }
+    });
+    
+    // Set all errors
+    setLeaderErrors(leaderErrors);
+    setTeamInfoErrors(teamInfoErrors);
+    setMemberErrors(memberErrors);
+    
+    // Check if there are any errors
+    const hasErrors = Object.keys(leaderErrors).length > 0 || 
+                     Object.keys(teamInfoErrors).length > 0 || 
+                     Object.keys(memberErrors).length > 0;
+    
+    if (hasErrors) {
+      console.log('Client-side validation errors:', { leaderErrors, teamInfoErrors, memberErrors });
+      // Show errors on current tab instead of jumping
+      alert('يرجى إكمال جميع الحقول المطلوبة قبل المتابعة');
+      return;
+    }
+    
+    // No errors, show confirmation modal
     setShowSuccessModal(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
+    console.log('=== CONFIRMATION MODAL CONFIRMED ===');
+    console.log('About to send data to backend...');
     
-    console.log('Sending team form data:', formData);
-    
-    
-    setFormData({
-      teamName: '',
-      projectIdea: '',
-      teamNumber: '',
-      teamLeader: {
-        name: '',
-        email: '',
-        phone: '',
-        organization: '',
-        specialization: '',
-        role: 'قائد الفريق',
-        gender: '',
-        age: '',
-        skills: ''
-      },
-      members: [
-        { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
-        { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
-        { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' }
-      ]
-    });
-    
-    
-    setLeaderErrors({});
-    setTeamInfoErrors({});
-    setMemberErrors({});
-    
-   
-    setActiveTab(0);
-    
-    
-    setShowSuccessModal(false);
-    setShowFinalSuccessModal(true);
+    try {
+      setSubmitting(true);
+      
+      // Clear all previous errors
+      setLeaderErrors({});
+      setTeamInfoErrors({});
+      setMemberErrors({});
+
+      // Clean up form data before sending (convert empty strings to undefined for optional fields)
+      const cleanFormData = {
+        ...formData,
+        members: formData.members.map(member => ({
+          ...member,
+          phone: member.phone || undefined,
+          organization: member.organization || undefined,
+          specialization: member.specialization || undefined,
+          gender: member.gender === "" ? undefined : member.gender,
+          age: member.age || undefined,
+          skills: member.skills || undefined
+        }))
+      };
+      
+      console.log('Cleaned form data:', cleanFormData);
+      
+      // Send team registration data to backend
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cleanFormData),
+        cache: "no-store",
+      });
+
+      const data = await res.json().catch(() => ({} as Record<string, unknown>));
+      
+      console.log('Backend response status:', res.status);
+      console.log('Backend response data:', data);
+
+      if (res.status === 201 && data?.success) {
+        // Success → reset form, close confirm, show final success
+        setFormData({
+          teamName: '',
+          projectIdea: '',
+          teamNumber: '3', // Reset to minimum team size
+          teamLeader: {
+            name: '',
+            email: '',
+            phone: '',
+            organization: '',
+            specialization: '',
+            role: 'قائد الفريق',
+            gender: '',
+            age: '',
+            skills: ''
+          },
+          members: [
+            { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
+            { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' }
+          ]
+        });
+        
+        setActiveTab(0);
+        setShowSuccessModal(false);
+        setShowFinalSuccessModal(true);
+        return;
+      }
+
+      if (res.status === 400 || res.status === 409) {
+        // Backend validation / duplicate → show field errors
+        const serverErrors = (data?.errors ?? {}) as any;
+        
+        // Handle nested errors for teamLeader and members
+        if (serverErrors.teamLeader) {
+          setLeaderErrors(serverErrors.teamLeader);
+        }
+        if (serverErrors.members) {
+          setMemberErrors(serverErrors.members);
+        }
+        if (serverErrors.teamName || serverErrors.projectIdea || serverErrors.teamNumber) {
+          setTeamInfoErrors(serverErrors);
+        }
+        
+        setShowSuccessModal(false); // close confirm, go back to form
+        
+        // Don't automatically change tabs - let user see errors on current tab
+        // Just log the errors for debugging
+        console.log('Backend validation errors:', serverErrors);
+        
+        // Show detailed error information
+        if (serverErrors.members) {
+          console.log('Member validation errors:', serverErrors.members);
+          Object.keys(serverErrors.members).forEach(memberIndex => {
+            const memberErrors = serverErrors.members[memberIndex];
+            console.log(`Member ${memberIndex} errors:`, memberErrors);
+          });
+        }
+        return;
+      }
+
+      // Any other error
+      alert(data?.message || "حدث خطأ في الخادم. حاول لاحقًا.");
+      setShowSuccessModal(false);
+
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("تعذر الاتصال بالخادم. تحقق من الاتصال ثم حاول مجددًا.");
+      setShowSuccessModal(false);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCloseFinalModal = () => {
@@ -1038,7 +1192,8 @@ export default function TeamRegistrationForm() {
                  // Final confirmation button in review section
               <button
                 onClick={handleSubmit}
-                   className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] mt-3 sm:mt-4 md:mt-6 bg-gradient-to-r from-[#FFD230] to-[#C0B7E8] text-[#343045] font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-lg sm:text-xl md:text-2xl lg:text-3xl focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                disabled={submitting}
+                className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] mt-3 sm:mt-4 md:mt-6 bg-gradient-to-r from-[#FFD230] to-[#C0B7E8] text-[#343045] font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-lg sm:text-xl md:text-2xl lg:text-3xl focus:ring-2 focus:ring-yellow-400/30 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                    style={{
                      fontFamily: 'Adobe Arabic, Arial',
                      fontWeight: 400,
@@ -1046,7 +1201,7 @@ export default function TeamRegistrationForm() {
                      letterSpacing: '0%'
                    }}
                  >
-                   إرسال التسجيل
+                   {submitting ? 'جاري الإرسال...' : 'إرسال التسجيل'}
                  </button>
                ) : (
                  // Continue to next section button
@@ -1135,13 +1290,14 @@ export default function TeamRegistrationForm() {
                 {/* Confirm Button */}
                 <button
                   onClick={handleCloseModal}
-                  className="w-full py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-base sm:text-lg md:text-xl lg:text-2xl font-semibold"
+                  disabled={submitting}
+                  className="w-full py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-base sm:text-lg md:text-xl lg:text-2xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   style={{
                     background: 'linear-gradient(135deg, #C0B7E8 0%, #FFD230 100%)',
                     color: '#343045'
                   }}
                 >
-                  تأكيد التسجيل
+                  {submitting ? 'جاري التسجيل...' : 'تأكيد التسجيل'}
                 </button>
 
                 {/* Previous Button */}
