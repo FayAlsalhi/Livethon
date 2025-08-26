@@ -46,7 +46,7 @@ const teamMemberSchema = z.object({
     .string()
     .optional()
     .refine((val) => {
-      if (!val) return true; // Optional for members
+      if (!val) return true; 
       const n = parseInt(val, 10);
       return Number.isInteger(n) && n >= 12 && n <= 100;
     }, "العمر يجب أن يكون بين 12 و 100 سنة"),
@@ -114,12 +114,10 @@ export const teamRegisterSchema = z.object({
   members: z
     .array(teamMemberSchema)
     .refine((members) => {
-      // Validate that all members have role "عضو"
       return members.every(member => member.role === "عضو");
     }, "جميع الأعضاء يجب أن يكون لديهم دور 'عضو'"),
 });
 
-// Schema for updating team status (admin use)
 export const teamStatusUpdateSchema = z.object({
   status: z.enum(["pending", "approved", "rejected", "cancelled"], {
     required_error: "حالة الفريق مطلوبة",
@@ -127,7 +125,6 @@ export const teamStatusUpdateSchema = z.object({
   notes: z.string().optional(),
 });
 
-// Schema for team search/filtering (admin use)
 export const teamSearchSchema = z.object({
   status: z.enum(["pending", "approved", "rejected", "cancelled"]).optional(),
   teamName: z.string().optional(),

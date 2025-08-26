@@ -5,18 +5,17 @@ const TeamMemberSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, lowercase: true, trim: true },
-    phone: { type: String, trim: true }, // Optional for members
-    organization: { type: String, trim: true }, // Optional for members
-    specialization: { type: String, trim: true }, // Optional for members
+    phone: { type: String, trim: true }, 
+    organization: { type: String, trim: true }, 
+    specialization: { type: String, trim: true },
     role: { type: String, required: true, enum: ["قائد الفريق", "عضو"] },
-    gender: { type: String, trim: true }, // Optional for members
-    age: { type: String, trim: true }, // Optional for members
-    skills: { type: String, trim: true }, // Optional for members
+    gender: { type: String, trim: true }, 
+    age: { type: String, trim: true },
+    skills: { type: String, trim: true }, 
   },
-  { _id: false } // Disable _id for embedded documents
+  { _id: false }
 );
 
-// Main Team Schema
 const TeamSchema = new mongoose.Schema(
   {
     teamName: { type: String, required: true, trim: true, unique: true },
@@ -30,14 +29,13 @@ const TeamSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected", "cancelled"] 
     },
     registrationDate: { type: Date, default: Date.now },
-    notes: { type: String, trim: true }, // Admin notes
+    notes: { type: String, trim: true }, 
   },
   { 
     timestamps: true
   }
 );
 
-// Pre-save middleware to validate team size
 TeamSchema.pre('save', function(next) {
   const expectedMemberCount = parseInt(this.teamNumber) - 1;
   if (this.members.length !== expectedMemberCount) {
@@ -46,7 +44,6 @@ TeamSchema.pre('save', function(next) {
   next();
 });
 
-// Static method to check for email conflicts
 TeamSchema.statics.checkEmailConflicts = async function(emails, excludeTeamId = null) {
   const query = {
     $or: [
@@ -62,7 +59,6 @@ TeamSchema.statics.checkEmailConflicts = async function(emails, excludeTeamId = 
   return await this.findOne(query);
 };
 
-// Instance method to get all team member emails
 TeamSchema.methods.getAllEmails = function() {
   const emails = [this.teamLeader.email];
   this.members.forEach(member => {
@@ -71,12 +67,10 @@ TeamSchema.methods.getAllEmails = function() {
   return emails;
 };
 
-// Instance method to get team size
 TeamSchema.methods.getTeamSize = function() {
-  return 1 + this.members.length; // Leader + members
+  return 1 + this.members.length; 
 };
 
-// Create indexes for efficient querying
 TeamSchema.index({ "teamLeader.email": 1 });
 TeamSchema.index({ "members.email": 1 });
 TeamSchema.index({ status: 1 });

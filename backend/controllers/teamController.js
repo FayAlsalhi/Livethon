@@ -7,7 +7,6 @@ export const registerTeam = async (req, res) => {
   console.log(`🚀 Team registration attempt from IP: ${req.ip}`);
   
   try {
-    // Parse and validate request data
     const parsed = teamRegisterSchema.safeParse(req.body);
     if (!parsed.success) {
       const errors = {};
@@ -21,7 +20,6 @@ export const registerTeam = async (req, res) => {
           }
         }
         
-        // Handle nested errors for teamLeader and members
         if (field === "teamLeader" && e.path.length > 1) {
           const subField = e.path[1];
           if (!errors.teamLeader[subField]) {
@@ -46,7 +44,6 @@ export const registerTeam = async (req, res) => {
 
     const data = parsed.data;
 
-    // Validate team size matches member count
     const expectedMemberCount = parseInt(data.teamNumber) - 1;
     if (data.members.length !== expectedMemberCount) {
       return res.status(400).json({
@@ -58,7 +55,6 @@ export const registerTeam = async (req, res) => {
       });
     }
 
-    // Collect all emails for conflict checking
     const allEmails = [data.teamLeader.email, ...data.members.map(m => m.email)];
     const uniqueEmails = [...new Set(allEmails)];
     
@@ -72,7 +68,6 @@ export const registerTeam = async (req, res) => {
       });
     }
 
-    // Check for email conflicts with existing teams
     const existingTeam = await Team.checkEmailConflicts(allEmails);
     if (existingTeam) {
       const conflictingEmails = [];
@@ -94,7 +89,6 @@ export const registerTeam = async (req, res) => {
       });
     }
 
-    // Check for email conflicts with individual registrations
     const existingIndividuals = await Individual.find({
       email: { $in: allEmails }
     });
@@ -110,7 +104,6 @@ export const registerTeam = async (req, res) => {
       });
     }
 
-    // Check for phone conflicts (only for team leader)
     if (data.teamLeader.phone && data.teamLeader.phone.trim()) {
       const existingPhone = await Individual.findOne({
         phone: data.teamLeader.phone.trim()
@@ -128,7 +121,6 @@ export const registerTeam = async (req, res) => {
         });
       }
 
-      // Check with existing teams
       const existingTeamPhone = await Team.findOne({
         "teamLeader.phone": data.teamLeader.phone.trim()
       });
@@ -146,7 +138,6 @@ export const registerTeam = async (req, res) => {
       }
     }
 
-    // Create the team
     const team = await Team.create({
       teamName: data.teamName.trim(),
       projectIdea: data.projectIdea.trim(),
@@ -173,7 +164,6 @@ export const registerTeam = async (req, res) => {
       }))
     });
 
-    // Return success response
     const responseTime = Date.now() - startTime;
     console.log(`✅ Team registration successful: ${team.teamName} (${responseTime}ms)`);
     
@@ -192,7 +182,6 @@ export const registerTeam = async (req, res) => {
   } catch (error) {
     console.error("❌ Team registration error:", error);
 
-    // Handle validation errors from mongoose
     if (error.name === "ValidationError") {
       const errors = {};
       for (const field in error.errors) {
@@ -205,7 +194,6 @@ export const registerTeam = async (req, res) => {
       });
     }
 
-    // Handle duplicate key errors
     if (error?.code === 11000) {
       if (error.keyPattern?.teamName) {
         return res.status(409).json({

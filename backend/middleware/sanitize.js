@@ -5,7 +5,6 @@ const cleanString = (v) =>
     .replace(/[\u0000-\u001F]/g, "") 
     .trim();
 
-// Recursively sanitize keys ($ and .) and normalize strings
 const sanitizeDeep = (value) => {
   if (Array.isArray(value)) {
     return value.map(sanitizeDeep);
