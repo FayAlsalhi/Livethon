@@ -23,6 +23,9 @@ interface TeamFormData {
   teamLeader: TeamMember;
   members: TeamMember[];
 }
+// API configuration - direct backend communication
+const API_URL = 'http://localhost:5050/api/register/team';
+
 
 export default function TeamRegistrationForm() {
   const [activeTab, setActiveTab] = useState(0);
@@ -31,11 +34,14 @@ export default function TeamRegistrationForm() {
   const [leaderErrors, setLeaderErrors] = useState<Partial<Record<keyof TeamMember, string>>>({});
   const [teamInfoErrors, setTeamInfoErrors] = useState<Record<string, string>>({});
   const [memberErrors, setMemberErrors] = useState<Record<number, Partial<Record<keyof TeamMember, string>>>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+
   
   const [formData, setFormData] = useState<TeamFormData>({
     teamName: '',
     projectIdea: '',
-    teamNumber: '',
+    teamNumber: '3', // Default to 3 members (minimum)
     teamLeader: {
       name: '',
       email: '',
@@ -48,7 +54,6 @@ export default function TeamRegistrationForm() {
       skills: ''
     },
     members: [
-      { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
       { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
       { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' }
     ]
@@ -72,16 +77,39 @@ export default function TeamRegistrationForm() {
     }
   };
 
-  const updateTeamInfo = (field: keyof Pick<TeamFormData, 'teamName' | 'projectIdea'>, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    if (teamInfoErrors[field]) {
-      setTeamInfoErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
+  const updateTeamInfo = (field: keyof Pick<TeamFormData, 'teamName' | 'projectIdea' | 'teamNumber'>, value: string) => {
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // If teamNumber changed, update members array
+      if (field === 'teamNumber') {
+        const memberCount = parseInt(value) - 1; // Subtract 1 for team leader
+        const newMembers = [];
+        
+        for (let i = 0; i < memberCount; i++) {
+          // Keep existing member data if available, otherwise create new
+          newMembers.push(prev.members[i] || {
+            name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: ''
+          });
+        }
+        
+        newData.members = newMembers;
+        
+        // Clear member errors for removed members
+        setMemberErrors(prev => {
+          const newErrors = { ...prev };
+          Object.keys(newErrors).forEach(key => {
+            const index = parseInt(key);
+            if (index >= memberCount) {
+              delete newErrors[index];
+            }
+          });
+          return newErrors;
+        });
+      }
+      
+      return newData;
+    });
   };
 
   const updateMember = (memberIndex: number, field: keyof TeamMember, value: string) => {
@@ -98,9 +126,7 @@ export default function TeamRegistrationForm() {
         const newErrors = { ...prev };
         if (newErrors[memberIndex]) {
           delete newErrors[memberIndex][field];
-          if (Object.keys(newErrors[memberIndex]).length === 0) {
-            delete newErrors[memberIndex];
-          }
+          
         }
         return newErrors;
       });
@@ -108,48 +134,175 @@ export default function TeamRegistrationForm() {
   };
 
   const handleSubmit = () => {
+    console.log('=== SUBMIT BUTTON CLICKED ===');
+    console.log('Current active tab:', activeTab);
     console.log('Form Data:', formData);
+    
+     // Client-side validation before showing confirmation modal
+    const leaderErrors = validateTeamLeader();
+    const teamInfoErrors: Record<string, string> = {};
+    
+    // Debug form data
+    console.log('Team size:', formData.teamNumber);
+    console.log('Members count:', formData.members.length);
+    console.log('Expected members:', parseInt(formData.teamNumber) - 1);
+
+    // Validate team info
+    if (!formData.teamName.trim()) teamInfoErrors.teamName = 'اسم الفريق مطلوب';
+    if (!formData.projectIdea.trim()) teamInfoErrors.projectIdea = 'فكرة المشروع مطلوبة';
+    if (!formData.teamNumber) teamInfoErrors.teamNumber = 'يجب تحديد عدد أعضاء الفريق';
+    
+    
+     // Validate members
+     const memberErrors: Record<number, Partial<Record<keyof TeamMember, string>>> = {};
+     formData.members.forEach((member, index) => {
+       if (!member.name.trim()) {
+         if (!memberErrors[index]) memberErrors[index] = {};
+         memberErrors[index]!.name = 'اسم العضو مطلوب';
+       }
+       if (!member.email.trim()) {
+         if (!memberErrors[index]) memberErrors[index] = {};
+         memberErrors[index]!.email = 'البريد الإلكتروني مطلوب';
+       }
+     });
+ 
+     // Set all errors
+     setLeaderErrors(leaderErrors);
+     setTeamInfoErrors(teamInfoErrors);
+     setMemberErrors(memberErrors);
+    
+    
+     // Check if there are any errors
+     const hasErrors = Object.keys(leaderErrors).length > 0 || 
+     Object.keys(teamInfoErrors).length > 0 || 
+     Object.keys(memberErrors).length > 0;
+    
+   
+     if (hasErrors) {
+      console.log('Client-side validation errors:', { leaderErrors, teamInfoErrors, memberErrors });
+      // Show errors on current tab instead of jumping
+      alert('يرجى إكمال جميع الحقول المطلوبة قبل المتابعة');
+      return;
+    }
+
+    // No errors, show confirmation modal
     setShowSuccessModal(true);
   };
 
-  const handleCloseModal = () => {
-    
-    console.log('Sending team form data:', formData);
-    
-    
-    setFormData({
-      teamName: '',
-      projectIdea: '',
-      teamNumber: '',
-      teamLeader: {
-        name: '',
-        email: '',
-        phone: '',
-        organization: '',
-        specialization: '',
-        role: 'قائد الفريق',
-        gender: '',
-        age: '',
-        skills: ''
-      },
-      members: [
-        { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
-        { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
-        { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' }
-      ]
-    });
+  const handleCloseModal = async () => {
+    console.log('=== CONFIRMATION MODAL CONFIRMED ===');
+    console.log('About to send data to backend...');
     
     
-    setLeaderErrors({});
-    setTeamInfoErrors({});
-    setMemberErrors({});
-    
-   
-    setActiveTab(0);
-    
-    
-    setShowSuccessModal(false);
-    setShowFinalSuccessModal(true);
+    try {
+      setSubmitting(true);
+      
+      // Clear all previous errors
+      setLeaderErrors({});
+      setTeamInfoErrors({});
+      setMemberErrors({});
+
+      // Clean up form data before sending (convert empty strings to undefined for optional fields)
+      const cleanFormData = {
+        ...formData,
+        members: formData.members.map(member => ({
+          ...member,
+          phone: member.phone || undefined,
+          organization: member.organization || undefined,
+          specialization: member.specialization || undefined,
+          gender: member.gender === "" ? undefined : member.gender,
+          age: member.age || undefined,
+          skills: member.skills || undefined
+        }))
+      };
+      
+      console.log('Cleaned form data:', cleanFormData);
+      
+      // Send team registration data to backend
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cleanFormData),
+        cache: "no-store",
+      });
+
+      const data = await res.json().catch(() => ({} as Record<string, unknown>));
+      
+      console.log('Backend response status:', res.status);
+      console.log('Backend response data:', data);
+
+      if (res.status === 201 && data?.success) {
+        // Success → reset form, close confirm, show final success
+        setFormData({
+          teamName: '',
+          projectIdea: '',
+          teamNumber: '3', // Reset to minimum team size
+          teamLeader: {
+            name: '',
+            email: '',
+            phone: '',
+            organization: '',
+            specialization: '',
+            role: 'قائد الفريق',
+            gender: '',
+            age: '',
+            skills: ''
+          },
+          members: [
+            { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' },
+            { name: '', email: '', phone: '', organization: '', specialization: '', role: 'عضو', gender: '', age: '', skills: '' }
+          ]
+        });
+        
+        setActiveTab(0);
+        setShowSuccessModal(false);
+        setShowFinalSuccessModal(true);
+        return;
+      }
+
+      if (res.status === 400 || res.status === 409) {
+        // Backend validation / duplicate → show field errors
+        const serverErrors = (data?.errors ?? {}) as any;
+        
+        // Handle nested errors for teamLeader and members
+        if (serverErrors.teamLeader) {
+          setLeaderErrors(serverErrors.teamLeader);
+        }
+        if (serverErrors.members) {
+          setMemberErrors(serverErrors.members);
+        }
+        if (serverErrors.teamName || serverErrors.projectIdea || serverErrors.teamNumber) {
+          setTeamInfoErrors(serverErrors);
+        }
+        
+        setShowSuccessModal(false); // close confirm, go back to form
+        
+        // Don't automatically change tabs - let user see errors on current tab
+        // Just log the errors for debugging
+        console.log('Backend validation errors:', serverErrors);
+        
+        // Show detailed error information
+        if (serverErrors.members) {
+          console.log('Member validation errors:', serverErrors.members);
+          Object.keys(serverErrors.members).forEach(memberIndex => {
+            const memberErrors = serverErrors.members[memberIndex];
+            console.log(`Member ${memberIndex} errors:`, memberErrors);
+          });
+        }
+        return;
+      }
+
+      // Any other error
+      alert(data?.message || "حدث خطأ في الخادم. حاول لاحقًا.");
+      setShowSuccessModal(false);
+
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("تعذر الاتصال بالخادم. تحقق من الاتصال ثم حاول مجددًا.");
+      setShowSuccessModal(false);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCloseFinalModal = () => {
@@ -162,14 +315,17 @@ export default function TeamRegistrationForm() {
       case 'name':
         if (!trimmed) return 'هذا الحقل مطلوب';
         if (trimmed.length < 2) return 'الاسم قصير جداً';
+        if (!/^[\u0600-\u06FF\s]+$/.test(trimmed)) return 'الاسم يجب أن يكون باللغة العربية فقط';
         return undefined;
       case 'gender':
         if (!trimmed) return 'الرجاء اختيار الجنس';
         return undefined;
-      case 'email':
-        if (!trimmed) return 'هذا الحقل مطلوب';
-        if (!/^\S+@\S+\.\S+$/.test(trimmed)) return 'صيغة البريد الإلكتروني غير صحيحة';
-        return undefined;
+        case 'email':
+          if (!trimmed) return 'هذا الحقل مطلوب';
+          if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(trimmed)) {
+              return 'صيغة البريد الإلكتروني غير صحيحة أو تحتوي على حروف غير إنجليزية';
+          }
+          return undefined;
       case 'phone':
         if (!trimmed) return 'هذا الحقل مطلوب';
         
@@ -255,13 +411,16 @@ export default function TeamRegistrationForm() {
         memberErrors.name = 'اسم العضو مطلوب';
       } else if (member.name.trim().length < 2) {
         memberErrors.name = 'الاسم قصير جداً';
+      } else if (!/^[\u0600-\u06FF\s]+$/.test(member.name.trim())) {
+        memberErrors.name = 'الاسم يجب أن يكون باللغة العربية فقط';
       }
       
       if (!member.email?.trim()) {
         memberErrors.email = 'البريد الإلكتروني مطلوب';
-      } else if (!/^\S+@\S+\.\S+$/.test(member.email.trim())) {
-        memberErrors.email = 'صيغة البريد الإلكتروني غير صحيحة';
+      } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(member.email.trim())) {
+        memberErrors.email = 'صيغة البريد الإلكتروني غير صحيحة أو يحتوي على أحرف غير إنجليزية';
       }
+      
       
       if (Object.keys(memberErrors).length > 0) {
         errors[i] = memberErrors;
@@ -300,7 +459,6 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
               >
                 الاسم : 
               </label>
@@ -309,14 +467,13 @@ export default function TeamRegistrationForm() {
                  value={formData.teamLeader.name}
                  onChange={(e) => updateTeamLeader('name', e.target.value)}
                  placeholder="ادخل الاسم كاملا"
-                 className={`w-full text-white placeholder-gray-500 text-right focus:ring-3 focus:outline-none transition-all text-sm md:text-base lg:text-lg xl:text-xl focus:ring-gray-500/100 ${leaderErrors.name ? 'ring-1 ring-red-500' : ''}`}
+                 className={`w-full text-gray-300 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base lg:text-lg xl:text-xl focus:ring-gray-500/100 ${leaderErrors.name ? 'ring-1 ring-red-500' : ''}`}
                  style={{
                    height: '42px',
                    borderRadius: '11.3px',
                    padding: '15.07px',
                    backgroundColor: '#343045',
-                   border: 'none',
-                   fontFamily: 'Adobe Arabic, Arial'
+                   border: 'none'
                  }}
                />
                {leaderErrors.name && (
@@ -329,7 +486,6 @@ export default function TeamRegistrationForm() {
               <div className="flex gap-3">
                 <label 
                   className="block text-right mb-2 mt-1 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                  style={{ fontFamily: 'Adobe Arabic, Arial' }}
                 >
                   الجنس :
                 </label>
@@ -347,8 +503,7 @@ export default function TeamRegistrationForm() {
                     height: '42px',
                     borderRadius: '11.3px',
                     border: 'none',
-                    fontWeight: 400,
-                    fontFamily: 'Adobe Arabic, Arial'
+                    fontWeight: 400
                   }}
                 >
                   أنثى
@@ -366,8 +521,7 @@ export default function TeamRegistrationForm() {
                     height: '42px',
                     borderRadius: '11.3px',
                     border: 'none',
-                    fontWeight: 400,
-                    fontFamily: 'Adobe Arabic, Arial'
+                    fontWeight: 400
                   }}
                 >
                   ذكر
@@ -382,7 +536,6 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
               >
                 الإيميل :
               </label>
@@ -391,7 +544,7 @@ export default function TeamRegistrationForm() {
                 value={formData.teamLeader.email}
                 onChange={(e) => updateTeamLeader('email', e.target.value)}
                 placeholder="example@email.com"
-                className={`w-full text-white placeholder-gray-500 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base focus:ring-gray-500/100 ${leaderErrors.email ? 'ring-1 ring-red-500' : ''}`}
+                className={`w-full text-gray-300 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base focus:ring-gray-500/100 ${leaderErrors.email ? 'ring-1 ring-red-500' : ''}`}
                 dir="ltr"
                 style={{
                   height: '42px',
@@ -399,7 +552,7 @@ export default function TeamRegistrationForm() {
                   padding: '15.07px',
                   backgroundColor: '#343045',
                   border: 'none',
-                  fontFamily: 'Adobe Arabic, Arial'
+                  
                 }}
               />
               {leaderErrors.email && (
@@ -411,7 +564,6 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
               >
                 رقم الجوال :
               </label>
@@ -420,7 +572,7 @@ export default function TeamRegistrationForm() {
                 value={formData.teamLeader.phone}
                 onChange={(e) => updateTeamLeader('phone', e.target.value)}
                 placeholder="+966 5# ### ####"
-                className={`w-full text-white placeholder-gray-500 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base focus:ring-gray-500/100 ${leaderErrors.phone ? 'ring-1 ring-red-500' : ''}`}
+                className={`w-full text-gray-300 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base focus:ring-gray-500/100 ${leaderErrors.phone ? 'ring-1 ring-red-500' : ''}`}
                 dir="ltr"
                 style={{
                   height: '42px',
@@ -428,7 +580,7 @@ export default function TeamRegistrationForm() {
                   padding: '15.07px',
                   backgroundColor: '#343045',
                   border: 'none',
-                  fontFamily: 'Adobe Arabic, Arial'
+                  
                 }}
               />
               {leaderErrors.phone && (
@@ -440,7 +592,6 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
               >
                 جهة العمل / الدراسة :
               </label>
@@ -449,14 +600,14 @@ export default function TeamRegistrationForm() {
                 value={formData.teamLeader.organization}
                 onChange={(e) => updateTeamLeader('organization', e.target.value)}
                 placeholder="مثل جامعة القصيم"
-                className={`w-full text-white placeholder-gray-500 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base focus:ring-gray-500/100 ${leaderErrors.organization ? 'ring-1 ring-red-500' : ''}`}
+                className={`w-full text-gray-300 text-center focus:ring-3 focus:outline-none transition-all text-sm md:text-base focus:ring-gray-500/100 ${leaderErrors.organization ? 'ring-1 ring-red-500' : ''}`}
                 style={{
                   height: '42px',
                   borderRadius: '11.3px',
                   padding: '15.07px',
                   backgroundColor: '#343045',
                   border: 'none',
-                  fontFamily: 'Adobe Arabic, Arial'
+                  
                 }}
               />
               {leaderErrors.organization && (
@@ -468,7 +619,6 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
               >
                 التخصص :
               </label>
@@ -486,7 +636,7 @@ export default function TeamRegistrationForm() {
                     padding: '15.07px',
                     backgroundColor: '#343045',
                     border: 'none',
-                    fontFamily: 'Adobe Arabic, Arial'
+                    
                   }}
                 />
                 {leaderErrors.specialization && (
@@ -499,7 +649,6 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
               >
                 العمر :
               </label>
@@ -518,7 +667,7 @@ export default function TeamRegistrationForm() {
                     padding: '15.07px',
                     backgroundColor: '#343045',
                     border: 'none',
-                    fontFamily: 'Adobe Arabic, Arial'
+                    
                   }}
                 />
                 {leaderErrors.age && (
@@ -540,13 +689,13 @@ export default function TeamRegistrationForm() {
                 onChange={(e) => updateTeamLeader('skills', e.target.value)}
                 placeholder="اضف مهاراتك وخبراتك هنا"
                 rows={3}
-                className={`w-full text-white placeholder-gray-500 text-right focus:ring-3 focus:outline-none transition-all resize-none text-sm md:text-base focus:ring-gray-500/10 ${leaderErrors.skills ? 'ring-1 ring-red-500' : ''}`}
+                className={`w-full text-gray-300 text-right focus:ring-3 focus:outline-none transition-all resize-none text-sm md:text-base focus:ring-gray-500/10 ${leaderErrors.skills ? 'ring-1 ring-red-500' : ''}`}
                 style={{
                   borderRadius: '11.3px',
                   padding: '15.07px',
                   backgroundColor: '#343045',
                   border: 'none',
-                  fontFamily: 'Adobe Arabic, Arial'
+                  
                 }}
               />
               {leaderErrors.skills && (
@@ -576,7 +725,7 @@ export default function TeamRegistrationForm() {
                 <div key={index} className="w-full max-w-[548px] space-y-4">
                 <h4 
                   className="text-lg text-purple-300 mb-4 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                  style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                  
                 >
                   عضو  {index + 2}
                 </h4>
@@ -585,7 +734,7 @@ export default function TeamRegistrationForm() {
                   <div>
                   <label 
                     className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                    style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                    
                   >
                     الاسم :
                   </label>
@@ -601,7 +750,7 @@ export default function TeamRegistrationForm() {
                       padding: '15.07px',
                         backgroundColor: '#343045',
                       border: 'none',
-                      fontFamily: 'Adobe Arabic, Arial'
+                      
                       }}
                     />
                     {memberErrors[index]?.name && (
@@ -613,7 +762,7 @@ export default function TeamRegistrationForm() {
                   <div>
                   <label 
                     className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                    style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                    
                   >
                     الإيميل :
                   </label>
@@ -630,7 +779,7 @@ export default function TeamRegistrationForm() {
                       padding: '15.07px',
                         backgroundColor: '#343045',
                       border: 'none',
-                      fontFamily: 'Adobe Arabic, Arial'
+                      
                     }}
                   />
                   {memberErrors[index]?.email && (
@@ -650,7 +799,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                
               >
                 اسم الفريق :
               </label>
@@ -666,7 +815,7 @@ export default function TeamRegistrationForm() {
                   padding: '15.07px',
                   backgroundColor: '#343045',
                   border: 'none',
-                  fontFamily: 'Adobe Arabic, Arial'
+                  
                 }}
               />
               {teamInfoErrors.teamName && (
@@ -679,10 +828,53 @@ export default function TeamRegistrationForm() {
               <div className="flex gap-3">
                 <label 
                   className="block text-right mb-2 mt-1 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                  style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                  
                 >
                   عدد أعضاء الفريق :
                 </label>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      teamNumber: '3',
+                      members: Array(2).fill(null).map(() => ({ 
+                        name: '', 
+                        email: '', 
+                        phone: '', 
+                        organization: '', 
+                        specialization: '', 
+                        role: 'عضو', 
+                        gender: '', 
+                        age: '', 
+                        skills: '' 
+                      }))
+                    }));
+                    if (teamInfoErrors.teamNumber) {
+                      setTeamInfoErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors.teamNumber;
+                        return newErrors;
+                      });
+                    }
+                  }}
+                  className={`transition-all text-sm md:text-base lg:text-lg xl:text-xl ${
+                    formData.teamNumber === '3' 
+                      ? 'bg-[#7C73A8] text-white' 
+                      : 'bg-[#343045] text-gray-400 hover:bg-[#443655]'
+                  }`}
+                  style={{
+                    width: 'clamp(80px, 18vw, 99px)',
+                    height: '42px',
+                    borderRadius: '11.3px',
+                    border: 'none',
+                    fontWeight: 400,
+                    
+                  }}
+                >
+                  3 أعضاء
+                </button>
                 
                 <button
                   type="button"
@@ -721,7 +913,7 @@ export default function TeamRegistrationForm() {
                     borderRadius: '11.3px',
                     border: 'none',
                     fontWeight: 400,
-                    fontFamily: 'Adobe Arabic, Arial'
+                    
                   }}
                 >
                   4 أعضاء
@@ -763,7 +955,7 @@ export default function TeamRegistrationForm() {
                     borderRadius: '11.3px',
                     border: 'none',
                     fontWeight: 400,
-                    fontFamily: 'Adobe Arabic, Arial'
+                    
                   }}
                 >
                   5 أعضاء
@@ -778,7 +970,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                
               >
                 فكرة المشروع :
               </label>
@@ -793,7 +985,7 @@ export default function TeamRegistrationForm() {
                   padding: '15.07px',
                   backgroundColor: '#343045',
                   border: 'none',
-                  fontFamily: 'Adobe Arabic, Arial'
+                  
                 }}
               />
               {teamInfoErrors.projectIdea && (
@@ -810,7 +1002,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                
               >
                 اسم الفريق :
               </label>
@@ -834,7 +1026,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                
               >
                 عدد اعضاء الفريق :
               </label>
@@ -849,7 +1041,7 @@ export default function TeamRegistrationForm() {
                 }}
               >
                 <p className="text-gray-300 text-right text-lg md:text-xl">
-                  {formData.teamNumber === '4' ? 'اربعة اعضاء' : formData.teamNumber === '5' ? 'خمس اعضاء' : 'لم يتم الإدخال'}
+                  {formData.teamNumber === '3' ? 'ثلاثة اعضاء' : formData.teamNumber === '4' ? 'اربعة اعضاء' : formData.teamNumber === '5' ? 'خمس اعضاء' : 'لم يتم الإدخال'}
                 </p>
               </div>
             </div>
@@ -858,7 +1050,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                
               >
                 اسم قائد الفريق :
               </label>
@@ -882,7 +1074,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+                
               >
                 فكرة الفريق :
               </label>
@@ -906,7 +1098,7 @@ export default function TeamRegistrationForm() {
             <div className="w-full max-w-[548px]">
               <label 
                 className="block text-right mb-2 text-gray-300 text-xl md:text-2xl lg:text-3xl xl:text-4xl"
-                style={{ fontFamily: 'Adobe Arabic, Arial' }}
+
               >
                 اسماء اعضاء الفريق :
               </label>
@@ -1003,7 +1195,7 @@ export default function TeamRegistrationForm() {
             {/* TAB NAVIGATION BOX */}
             <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
               <div 
-                className="inline-flex gap-1 p-1 sm:p-2 rounded-[clamp(24px,6vw,48px)]"
+                className="inline-flex gap-1 p-2 sm:p-2 rounded-[clamp(24px,6vw,48px)] text-center"
                 style={{
                   background: 'rgba(52, 48, 69, 0.44)',
                   backdropFilter: 'blur(10px)',
@@ -1038,29 +1230,30 @@ export default function TeamRegistrationForm() {
                  // Final confirmation button in review section
               <button
                 onClick={handleSubmit}
-                   className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] mt-3 sm:mt-4 md:mt-6 bg-gradient-to-r from-[#FFD230] to-[#C0B7E8] text-[#343045] font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-lg sm:text-xl md:text-2xl lg:text-3xl focus:ring-2 focus:ring-yellow-400/30 focus:outline-none"
+                disabled={submitting}
+                className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] mt-3 sm:mt-4 md:mt-6 bg-gradient-to-r from-[#FFD230] to-[#C0B7E8] text-[#343045] font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-lg sm:text-xl md:text-2xl lg:text-3xl focus:ring-2 focus:ring-yellow-400/30 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                    style={{
-                     fontFamily: 'Adobe Arabic, Arial',
+                     
                      fontWeight: 400,
                      lineHeight: '100%',
                      letterSpacing: '0%'
                    }}
                  >
-                   إرسال التسجيل
+                  {submitting ? 'جاري الإرسال...' : 'إرسال التسجيل'}
                  </button>
                ) : (
                  // Continue to next section button
                  <button
                    onClick={handleNext}
+                   disabled={submitting}
                    className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] mt-3 sm:mt-4 md:mt-6 bg-gradient-to-r from-[#7C73A8] to-[#5A4F7B] text-white font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-lg sm:text-xl md:text-2xl lg:text-3xl focus:ring-2 focus:ring-purple-400/30 focus:outline-none"
                    style={{
-                     fontFamily: 'Adobe Arabic, Arial',
                      fontWeight: 400,
                      lineHeight: '100%',
                      letterSpacing: '0%'
                    }}
                  >
-                   إكمال التسجيل
+                   {submitting ? 'جاري التسجيل...' : 'إكمال التسجيل '}
                  </button>
                )}
                
@@ -1076,7 +1269,7 @@ export default function TeamRegistrationForm() {
                    }}
                    className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] bg-transparent border border-gray-500 text-gray-300 font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] hover:bg-gray-800/50 hover:border-gray-400 text-base sm:text-lg md:text-xl lg:text-2xl focus:ring-2 focus:ring-gray-400/30 focus:outline-none"
                    style={{
-                     fontFamily: 'Adobe Arabic, Arial',
+                     
                      fontWeight: 400,
                      lineHeight: '100%',
                      letterSpacing: '0%'
@@ -1123,9 +1316,7 @@ export default function TeamRegistrationForm() {
               {/* Body Text */}
               <p 
                 className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 max-w-2xl mb-8 sm:mb-12 leading-relaxed text-center px-2"
-                style={{
-                  fontFamily: 'Adobe Arabic, Arial'
-                }}
+                
               >
                 تأكد من صحة معلوماتك، حيث لا يمكن تعديلها بعد التسجيل ، يرجى التسجيل مرة واحدة فقط لضمان تنظيم العملية بشكل عادل.
               </p>
@@ -1174,9 +1365,7 @@ export default function TeamRegistrationForm() {
             <button
               onClick={handleCloseFinalModal}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-600 hover:bg-gray-500 transition-colors text-white text-xl font-bold z-20"
-              style={{
-                fontFamily: 'Adobe Arabic, Arial'
-              }}
+              
             >
               ×
             </button>
@@ -1187,7 +1376,7 @@ export default function TeamRegistrationForm() {
               <div 
                 className="space-y-2 sm:space-y-4 leading-relaxed mb-6 sm:mb-8"
                 style={{
-                  fontFamily: 'Adobe Arabic, Arial',
+                  
                   fontWeight: 400,
                   fontSize: 'clamp(16px, 3vw, 24px)',
                   lineHeight: '1.5',

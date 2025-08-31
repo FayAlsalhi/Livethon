@@ -13,9 +13,9 @@ export default function Sponsors() {
         </div>
         <div className="text-center">
           <div className="w-24 h-16 sm:w-32 sm:h-20 bg-gradient-to-r from-[#C0B7E8] to-[#FFD230] rounded-lg flex items-center justify-center mb-2">
-            <span className="text-white font-bold text-xs sm:text-sm font-[amiri]">شركاء تقنيون</span>
+            <span className="text-white font-bold text-xs sm:text-sm font-[amiri]">طاقات</span>
           </div>
-          <p className="text-gray-400 text-xs sm:text-sm font-[amiri]">دعم تقني</p>
+          <p className="text-gray-400 text-xs sm:text-sm font-[amiri]">دعم طاقات</p>
         </div>
         <div className="text-center">
           <div className="w-24 h-16 sm:w-32 sm:h-20 bg-gradient-to-r from-[#7877C6] to-[#FDCB00] rounded-lg flex items-center justify-center mb-2">

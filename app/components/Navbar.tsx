@@ -62,13 +62,13 @@ export default function Navbar() {
       <div className="flex gap-2 sm:gap-3 items-center">
         <Link
           href="#ertwaa"
-          className="px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 border border-[#7877C6] text-white rounded-4xl hover:bg-[#7877C6]/20 transition-colors ring-1 ring-[#8176AF] text-xs sm:text-sm md:text-base"
+          className="px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 border border-[#7877C6] text-white rounded-4xl hover:bg-[#7877C6]/20 transition-colors ring-1 ring-[#8176AF] text-xs sm:text-sm md:text-base hover-effect mobile-tap"
         >
           عضو إرتواء؟
         </Link>
         <Link
           href="/CRegistration"
-          className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-[#C0B7E8] to-[#FDCB00] text-[#343045] font-bold rounded-full hover:scale-105 transition-all duration-300 text-sm sm:text-base md:text-xl "
+          className="px-3 py-1 sm:px-4 sm:py-2 md:px-6 md:py-2 bg-gradient-to-r from-[#C0B7E8] to-[#FDCB00] text-[#343045] font-bold rounded-full hover:scale-105 transition-all duration-300 text-sm sm:text-base md:text-xl hover-effect mobile-tap"
         >
           التسجيل
         </Link>
@@ -83,17 +83,17 @@ export default function Navbar() {
       </div>
       {mobileNavOpen && (
         <div className="md:hidden absolute left-3 top-full z-50">
-          <div className="mt-2 rounded-2xl p-3 flex flex-col items-stretch bg-[#7877C6]/15 divide-y divide-white/30">
-            <Link href="#about" onClick={handleNavClick} className="block w-full text-white text-base px-4 py-2 ">
+          <div className="mt-1 rounded-2xl p-4 flex flex-col items-stretch backdrop-blur-lg bg-[#3A3844]/10 border border-[#7877C6]/20 shadow-lg">
+            <Link href="#about" onClick={handleNavClick} className="block w-full text-white text-base font-bold px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-300 text-center">
               حول الهاكثون
             </Link>
-            <Link href="#participation" onClick={handleNavClick} className="block w-full text-white text-base px-4 py-2 ">
+            <Link href="#participation" onClick={handleNavClick} className="block w-full text-white text-base font-bold px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-300 text-center">
               المشاركة
             </Link>
-            <Link href="#timeline" onClick={handleNavClick} className="block w-full text-white text-base px-4 py-2 ">
+            <Link href="#timeline" onClick={handleNavClick} className="block w-full text-white text-base font-bold px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-300 text-center">
               الجدول الزمني
             </Link>
-            <Link href="#faq" onClick={handleNavClick} className="block w-full text-white text-base px-4 py-2 ">
+            <Link href="#faq" onClick={handleNavClick} className="block w-full text-white text-base font-bold px-4 py-3 hover:bg-white/10 rounded-xl transition-all duration-300 text-center">
               الأسئلة الشائعة
             </Link>
           </div>

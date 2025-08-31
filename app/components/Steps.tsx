@@ -29,8 +29,8 @@ export default function Steps() {
                   className="text-white text-lg sm:text-xl md:text-2xl leading-relaxed mb-0"
                   dangerouslySetInnerHTML={{ __html: s.text }}
                 />
-                <div className="absolute left-4 sm:left-6 bottom-4 sm:bottom-6">
-                  <s.icon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
+                <div className="absolute left-2 sm:left-6 bottom-4 sm:bottom-6">
+                  <s.icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
                 </div>
               </div>
             </div>
@@ -52,7 +52,7 @@ export default function Steps() {
                 التصويت من قبل<br/>أعضاء ارتواء .
               </p>
               <div className="absolute left-4 sm:left-6 bottom-4 sm:bottom-6">
-                <Vote className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
+                <Vote className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
               </div>
             </div>
           </div>

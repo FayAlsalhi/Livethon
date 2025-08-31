@@ -1,30 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap');
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #08070D;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-amiri: var(--font-amiri);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-amiri), Arial, sans-serif;
-}
 
 html {
   scroll-behavior: smooth;
@@ -32,36 +7,181 @@ html {
 }
 
 body {
+  background: #08070D;
+  color: #ffffff;
   overscroll-behavior: none;
   overflow-x: hidden;
+  font-family: 'Tajawal';
 }
-
-
 header.active {
   padding-top: 40px;
   transition: padding-top 0.3s ease;
 }
-
 * {
   overscroll-behavior: none;
+  font-family: 'Tajawal';
+}
+
+html, body {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.min-h-screen {
+  overflow-x: hidden;
+  position: relative;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.glow {
+  animation: glow 4s ease-in-out infinite;
 }
 
 
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
 
-  
-  
-  html, body {
-    overscroll-behavior: none !important;
-    -webkit-overflow-scrolling: touch;
-    overflow-x: hidden;
-    touch-action: pan-y;
+@keyframes gentlePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes softGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(255, 193, 7, 0.05), 0 0 15px rgba(255, 193, 7, 0.03);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(255, 193, 7, 0.08), 0 0 25px rgba(255, 193, 7, 0.05);
+  }
+}
+
+.box-float {
+  animation: subtleFloat 6s ease-in-out infinite;
+}
+
+.box-pulse {
+  animation: gentlePulse 4s ease-in-out infinite;
+}
+
+.box-glow {
+  animation: softGlow 3s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background-color: #B9D440;
+  margin-right: 2px;
+  animation: blink 1s infinite;
+  vertical-align: text-bottom;
+}
+
+.hover-effect {
+  transition: all 0.3s ease;
+}
+
+.hover-effect:hover {
+  transform: scale(1.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1);
+  filter: brightness(1.1);
+}
+
+@media (max-width: 768px) {
+  .mobile-tap {
+    transition: transform 0.1s ease;
   }
   
-  
-  .min-h-screen {
-    overflow-x: hidden;
-    overscroll-behavior: none;
-    position: relative;
+  .mobile-tap:active {
+    transform: scale(1.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
   }
+}
 
+@keyframes heroFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+@keyframes heroFadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hero-text-1 {
+  animation: heroFadeInUp 0.6s ease-out 0.1s both;
+}
+
+.hero-text-2 {
+  animation: heroFadeInUp 0.6s ease-out 0.3s both;
+}
+
+.hero-text-3 {
+  animation: heroFadeInUp 0.6s ease-out 0.5s both;
+}
+
+.hero-logo {
+  animation: heroFadeInUp 0.6s ease-out 0.7s both;
+}
+
+.hero-flower {
+  animation: heroFadeInRight 0.6s ease-out 0.8s both;
+}
+
+.hero-date {
+  animation: heroFadeInUp 0.6s ease-out 0.9s both;
+}

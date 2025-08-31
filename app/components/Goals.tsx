@@ -26,7 +26,7 @@ export default function Goals() {
         {items.map((text, i) => (
           <div
             key={i}
-            className="min-w-0 aspect-square h-full p-2 sm:p-6 rounded-[30px] sm:rounded-[30px] flex items-center justify-center text-center"
+            className="min-w-0 aspect-square h-full p-2 sm:p-6 rounded-[30px] sm:rounded-[30px] flex items-center justify-center text-center box-float box-glow"
             style={{
               background:
                 "linear-gradient(180deg, rgba(255, 210, 48, 0.23) 0%, rgba(255, 255, 255, 0.05) 90%)",
