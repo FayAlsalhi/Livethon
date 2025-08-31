@@ -262,17 +262,17 @@ export default function TeamRegistrationForm() {
 
       if (res.status === 400 || res.status === 409) {
         // Backend validation / duplicate → show field errors
-        const serverErrors = (data?.errors ?? {}) as any;
+        const serverErrors = (data?.errors ?? {}) as Record<string, unknown>;
         
         // Handle nested errors for teamLeader and members
-        if (serverErrors.teamLeader) {
-          setLeaderErrors(serverErrors.teamLeader);
+        if (serverErrors.teamLeader && typeof serverErrors.teamLeader === 'object') {
+          setLeaderErrors(serverErrors.teamLeader as Partial<Record<keyof TeamMember, string>>);
         }
-        if (serverErrors.members) {
-          setMemberErrors(serverErrors.members);
+        if (serverErrors.members && typeof serverErrors.members === 'object') {
+          setMemberErrors(serverErrors.members as Record<number, Partial<Record<keyof TeamMember, string>>>);
         }
         if (serverErrors.teamName || serverErrors.projectIdea || serverErrors.teamNumber) {
-          setTeamInfoErrors(serverErrors);
+          setTeamInfoErrors(serverErrors as Record<string, string>);
         }
         
         setShowSuccessModal(false); // close confirm, go back to form
@@ -282,10 +282,10 @@ export default function TeamRegistrationForm() {
         console.log('Backend validation errors:', serverErrors);
         
         // Show detailed error information
-        if (serverErrors.members) {
+        if (serverErrors.members && typeof serverErrors.members === 'object') {
           console.log('Member validation errors:', serverErrors.members);
-          Object.keys(serverErrors.members).forEach(memberIndex => {
-            const memberErrors = serverErrors.members[memberIndex];
+          Object.keys(serverErrors.members as Record<string, unknown>).forEach(memberIndex => {
+            const memberErrors = (serverErrors.members as Record<string, unknown>)[memberIndex];
             console.log(`Member ${memberIndex} errors:`, memberErrors);
           });
         }
