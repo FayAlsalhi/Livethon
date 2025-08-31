@@ -8,7 +8,7 @@ const IndividualSchema = new mongoose.Schema(
     phone:          { type: String, required: true, unique: true, trim: true },
     studyWork:      { type: String, required: true, trim: true },
     specialization: { type: String, required: true, trim: true },
-    age:            { type: String, required: true, trim: true }, // per spec: string
+    age:            { type: String, required: true, trim: true }, 
     skills:         { type: String, required: true, trim: true },
   },
   { timestamps: true }

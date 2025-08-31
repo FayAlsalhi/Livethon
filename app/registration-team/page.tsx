@@ -120,7 +120,7 @@ export default function TeamRegistrationForm() {
       )
     }));
     
-   
+    // Clear error for this field
     if (memberErrors[memberIndex]?.[field]) {
       setMemberErrors(prev => {
         const newErrors = { ...prev };
@@ -1232,6 +1232,7 @@ export default function TeamRegistrationForm() {
                 onClick={handleSubmit}
                 disabled={submitting}
                 className="w-full max-w-[180px] sm:max-w-[199px] h-[44px] sm:h-[48px] mt-3 sm:mt-4 md:mt-6 bg-gradient-to-r from-[#FFD230] to-[#C0B7E8] text-[#343045] font-normal rounded-[clamp(20px,5vw,40px)] transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-lg sm:text-xl md:text-2xl lg:text-3xl focus:ring-2 focus:ring-yellow-400/30 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+               
                    style={{
                      
                      fontWeight: 400,
@@ -1326,13 +1327,14 @@ export default function TeamRegistrationForm() {
                 {/* Confirm Button */}
                 <button
                   onClick={handleCloseModal}
-                  className="w-full py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-base sm:text-lg md:text-xl lg:text-2xl font-semibold"
+                  disabled={submitting}
+                  className="w-full py-3 sm:py-4 px-6 sm:px-8 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg text-base sm:text-lg md:text-xl lg:text-2xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   style={{
                     background: 'linear-gradient(135deg, #C0B7E8 0%, #FFD230 100%)',
                     color: '#343045'
                   }}
                 >
-                  تأكيد التسجيل
+                  {submitting ? 'جاري التسجيل...' : 'تأكيد التسجيل'}
                 </button>
 
                 {/* Previous Button */}

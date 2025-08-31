@@ -1,11 +1,10 @@
-// collapse multiple spaces, strip control chars, then trim
+
 const cleanString = (v) =>
   v
-    .replace(/\s+/g, " ")            // collapse internal spaces
-    .replace(/[\u0000-\u001F]/g, "") // remove control chars
+    .replace(/\s+/g, " ")            
+    .replace(/[\u0000-\u001F]/g, "") 
     .trim();
 
-// Recursively sanitize keys ($ and .) and normalize strings
 const sanitizeDeep = (value) => {
   if (Array.isArray(value)) {
     return value.map(sanitizeDeep);
@@ -24,7 +23,6 @@ const sanitizeDeep = (value) => {
   return value;
 };
 
-// Body-only sanitizer (doesn't touch req.query in Express 5)
 export const sanitizeBody = (req, _res, next) => {
   if (req.body && typeof req.body === "object") {
     req.body = sanitizeDeep(req.body);

@@ -1,9 +1,8 @@
 import { z } from "zod";
 
-// Arabic letters + spaces
 const arabicRegex = /^[\u0600-\u06FF\s]+$/;
-// Saudi phone: +966XXXXXXXXX or 966XXXXXXXXX (9 digits after code)
-const saudiPhoneRegex = /^(\+966|966)[0-9]{9}$/;
+
+const saudiPhoneRegex = /^(?:\+966|0)5\d{8}$/;
 
 export const individualRegisterSchema = z.object({
   name: z
